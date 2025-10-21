@@ -211,7 +211,7 @@
             <h2>手机扫码使用</h2>
             <div class="qrcode-container">
                 <!-- 这里将生成二维码 -->
-                <canvas id="qrcode"></canvas>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wwsource.github.io" alt="QR Code">
             </div>
             <p class="instructions">使用手机扫描二维码，在移动设备上使用计算器</p>
         </div>
@@ -349,22 +349,6 @@
                 
                 calculator.updateDisplay();
             });
-        });
-        
-        // 生成二维码
-        const currentUrl = window.location.href;
-        const qrCanvas = document.getElementById('qrcode');
-        
-        // 使用QRCode.js生成二维码
-        QRCode.toCanvas(qrCanvas, currentUrl, {
-            width: 150,
-            margin: 1,
-            color: {
-                dark: '#000000',
-                light: '#FFFFFF'
-            }
-        }, function (error) {
-            if (error) console.error(error);
         });
     </script>
 </body>
