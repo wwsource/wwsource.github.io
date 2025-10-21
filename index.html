@@ -1,11 +1,371 @@
 <p>Hello 大家好</p>
 <p>我是WWSource，这是我的个人网站。 </p>
 
-<!-- 在二维码部分替换为以下代码 -->
-<div class="qrcode-section">
-    <div class="qrcode-container">
-        <!-- 使用在线生成的二维码图片 -->
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://example.com" alt="QR Code">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页计算器</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .calculator {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        
+        .display {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: right;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .previous-operand {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            min-height: 25px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .current-operand {
+            font-size: 2.5rem;
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        button {
+            border: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 20px 0;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .operator {
+            background-color: rgba(255, 165, 0, 0.7);
+        }
+        
+        .operator:hover {
+            background-color: rgba(255, 165, 0, 0.9);
+        }
+        
+        .equals {
+            background-color: rgba(34, 197, 94, 0.7);
+        }
+        
+        .equals:hover {
+            background-color: rgba(34, 197, 94, 0.9);
+        }
+        
+        .clear {
+            background-color: rgba(239, 68, 68, 0.7);
+        }
+        
+        .clear:hover {
+            background-color: rgba(239, 68, 68, 0.9);
+        }
+        
+        .span-two {
+            grid-column: span 2;
+        }
+        
+        .qrcode-section {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .qrcode-container {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 500px) {
+            .calculator {
+                padding: 15px;
+            }
+            
+            button {
+                padding: 15px 0;
+                font-size: 1.2rem;
+            }
+            
+            .current-operand {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>网页计算器</h1>
+        
+        <div class="calculator">
+            <div class="display">
+                <div class="previous-operand"></div>
+                <div class="current-operand">0</div>
+            </div>
+            
+            <div class="buttons">
+                <button class="clear span-two">AC</button>
+                <button class="delete">DEL</button>
+                <button class="operator">÷</button>
+                
+                <button>7</button>
+                <button>8</button>
+                <button>9</button>
+                <button class="operator">×</button>
+                
+                <button>4</button>
+                <button>5</button>
+                <button>6</button>
+                <button class="operator">-</button>
+                
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button class="operator">+</button>
+                
+                <button class="span-two">0</button>
+                <button>.</button>
+                <button class="equals">=</button>
+            </div>
+        </div>
+        
+        <div class="qrcode-section">
+            <h2>手机扫码使用</h2>
+            <div class="qrcode-container">
+                <!-- 这里将生成二维码 -->
+                <canvas id="qrcode"></canvas>
+            </div>
+            <p class="instructions">使用手机扫描二维码，在移动设备上使用计算器</p>
+        </div>
     </div>
-    <p>扫描二维码在手机上查看</p>
-</div>
+
+    <script>
+        // 计算器功能实现
+        class Calculator {
+            constructor(previousOperandElement, currentOperandElement) {
+                this.previousOperandElement = previousOperandElement;
+                this.currentOperandElement = currentOperandElement;
+                this.clear();
+            }
+            
+            clear() {
+                this.currentOperand = '0';
+                this.previousOperand = '';
+                this.operation = undefined;
+            }
+            
+            delete() {
+                if (this.currentOperand === '0' || this.currentOperand.length === 1) {
+                    this.currentOperand = '0';
+                } else {
+                    this.currentOperand = this.currentOperand.toString().slice(0, -1);
+                }
+            }
+            
+            appendNumber(number) {
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                if (this.currentOperand === '0' && number !== '.') {
+                    this.currentOperand = number.toString();
+                } else {
+                    this.currentOperand = this.currentOperand.toString() + number.toString();
+                }
+            }
+            
+            chooseOperation(operation) {
+                if (this.currentOperand === '') return;
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '';
+            }
+            
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(prev) || isNaN(current)) return;
+                
+                switch (this.operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '×':
+                        computation = prev * current;
+                        break;
+                    case '÷':
+                        if (current === 0) {
+                            alert("不能除以零");
+                            return;
+                        }
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                
+                this.currentOperand = computation;
+                this.operation = undefined;
+                this.previousOperand = '';
+            }
+            
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                let integerDisplay;
+                
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', {
+                        maximumFractionDigits: 0
+                    });
+                }
+                
+                if (decimalDigits != null) {
+                    return `${integerDisplay}.${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+            
+            updateDisplay() {
+                this.currentOperandElement.innerText = this.getDisplayNumber(this.currentOperand);
+                if (this.operation != null) {
+                    this.previousOperandElement.innerText = 
+                        `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+                } else {
+                    this.previousOperandElement.innerText = '';
+                }
+            }
+        }
+        
+        // 初始化计算器
+        const previousOperandElement = document.querySelector('.previous-operand');
+        const currentOperandElement = document.querySelector('.current-operand');
+        const calculator = new Calculator(previousOperandElement, currentOperandElement);
+        
+        // 按钮事件监听
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.classList.contains('span-two')) {
+                    if (button.innerText === 'AC') {
+                        calculator.clear();
+                    } else if (button.innerText === '0') {
+                        calculator.appendNumber(button.innerText);
+                    }
+                } else if (button.classList.contains('operator')) {
+                    calculator.chooseOperation(button.innerText);
+                } else if (button.classList.contains('equals')) {
+                    calculator.compute();
+                } else if (button.classList.contains('delete')) {
+                    calculator.delete();
+                } else {
+                    calculator.appendNumber(button.innerText);
+                }
+                
+                calculator.updateDisplay();
+            });
+        });
+        
+        // 生成二维码
+        const currentUrl = window.location.href;
+        const qrCanvas = document.getElementById('qrcode');
+        
+        // 使用QRCode.js生成二维码
+        QRCode.toCanvas(qrCanvas, currentUrl, {
+            width: 150,
+            margin: 1,
+            color: {
+                dark: '#000000',
+                light: '#FFFFFF'
+            }
+        }, function (error) {
+            if (error) console.error(error);
+        });
+    </script>
+</body>
+</html>
