@@ -1,355 +1,384 @@
-<p>Hello 大家好</p>
-<p>我是WWSource，这是我的个人网站。 </p>
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网页计算器</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <title>单杠训练数据多项式回归分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
-        
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
-            color: #fff;
+            color: #333;
         }
-        
         .container {
-            max-width: 500px;
-            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+            padding: 25px 30px;
             text-align: center;
         }
-        
         h1 {
-            margin-bottom: 20px;
-            font-size: 2.5rem;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
         }
-        
-        .calculator {
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-bottom: 30px;
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
-        
-        .display {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
+        .content {
+            display: flex;
+            flex-wrap: wrap;
             padding: 20px;
+        }
+        .chart-container {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+        }
+        .controls {
+            flex: 0 0 300px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-left: 15px;
+        }
+        .control-group {
             margin-bottom: 20px;
-            text-align: right;
-            min-height: 100px;
+        }
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 8px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .degree-value {
+            display: inline-block;
+            width: 30px;
+            text-align: center;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        button {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(to right, #2980b9, #2471a3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        .qrcode-container {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
         }
-        
-        .previous-operand {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.7);
-            min-height: 25px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .qrcode {
+            width: 180px;
+            height: 180px;
+            margin: 15px auto;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #666;
+            border: 1px dashed #ccc;
         }
-        
-        .current-operand {
-            font-size: 2.5rem;
-            font-weight: bold;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .share-text {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
         }
-        
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-        
-        button {
-            border: none;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 20px 0;
-            border-radius: 15px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        button:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .operator {
-            background-color: rgba(255, 165, 0, 0.7);
-        }
-        
-        .operator:hover {
-            background-color: rgba(255, 165, 0, 0.9);
-        }
-        
-        .equals {
-            background-color: rgba(34, 197, 94, 0.7);
-        }
-        
-        .equals:hover {
-            background-color: rgba(34, 197, 94, 0.9);
-        }
-        
-        .clear {
-            background-color: rgba(239, 68, 68, 0.7);
-        }
-        
-        .clear:hover {
-            background-color: rgba(239, 68, 68, 0.9);
-        }
-        
-        .span-two {
-            grid-column: span 2;
-        }
-        
-        .qrcode-section {
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
             text-align: center;
         }
-        
-        .qrcode-container {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-top: 10px;
+        .data-table th {
+            background-color: #f2f2f2;
         }
-        
-        .instructions {
-            margin-top: 20px;
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
             font-size: 0.9rem;
-            opacity: 0.8;
+            border-top: 1px solid #eee;
         }
-        
-        @media (max-width: 500px) {
-            .calculator {
-                padding: 15px;
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
             }
-            
-            button {
-                padding: 15px 0;
-                font-size: 1.2rem;
-            }
-            
-            .current-operand {
-                font-size: 2rem;
+            .controls {
+                margin-left: 0;
+                margin-top: 20px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>网页计算器</h1>
+        <header>
+            <h1>单杠训练数据多项式回归分析</h1>
+            <p class="subtitle">基于最小二乘法的多项式回归模型拟合</p>
+        </header>
         
-        <div class="calculator">
-            <div class="display">
-                <div class="previous-operand"></div>
-                <div class="current-operand">0</div>
+        <div class="content">
+            <div class="chart-container">
+                <canvas id="regressionChart"></canvas>
             </div>
             
-            <div class="buttons">
-                <button class="clear span-two">AC</button>
-                <button class="delete">DEL</button>
-                <button class="operator">÷</button>
+            <div class="controls">
+                <div class="control-group">
+                    <h2>回归参数设置</h2>
+                    <label for="degree">多项式次数: <span id="degreeValue" class="degree-value">2</span></label>
+                    <input type="range" id="degree" min="1" max="20" value="2">
+                    
+                    <button id="calculateBtn">计算回归曲线</button>
+                </div>
                 
-                <button>7</button>
-                <button>8</button>
-                <button>9</button>
-                <button class="operator">×</button>
-                
-                <button>4</button>
-                <button>5</button>
-                <button>6</button>
-                <button class="operator">-</button>
-                
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button class="operator">+</button>
-                
-                <button class="span-two">0</button>
-                <button>.</button>
-                <button class="equals">=</button>
+                <div class="results">
+                    <h2>手机扫码使用</h2>
+                    <div class="qrcode-section">
+                        <div class="qrcode-container">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wwsource.github.io" alt="QR Code">
+                        </div>
+                        <p class="share-text">
+                            使用手机扫描二维码<br>
+                            查看非线性回归效果
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div class="qrcode-section">
-            <h2>手机扫码使用</h2>
-            <div class="qrcode-container">
-                <!-- 这里将生成二维码 -->
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wwsource.github.io" alt="QR Code">
-            </div>
-            <p class="instructions">使用手机扫描二维码，在移动设备上使用计算器</p>
-        </div>
+        <footer>
+            <p>数据来源：单杠数据.xlsx | 代码来源：国防科大AI伴学助手 | 代码审核：王波</p>
+        </footer>
     </div>
 
     <script>
-        // 计算器功能实现
-        class Calculator {
-            constructor(previousOperandElement, currentOperandElement) {
-                this.previousOperandElement = previousOperandElement;
-                this.currentOperandElement = currentOperandElement;
-                this.clear();
-            }
-            
-            clear() {
-                this.currentOperand = '0';
-                this.previousOperand = '';
-                this.operation = undefined;
-            }
-            
-            delete() {
-                if (this.currentOperand === '0' || this.currentOperand.length === 1) {
-                    this.currentOperand = '0';
-                } else {
-                    this.currentOperand = this.currentOperand.toString().slice(0, -1);
-                }
-            }
-            
-            appendNumber(number) {
-                if (number === '.' && this.currentOperand.includes('.')) return;
-                if (this.currentOperand === '0' && number !== '.') {
-                    this.currentOperand = number.toString();
-                } else {
-                    this.currentOperand = this.currentOperand.toString() + number.toString();
-                }
-            }
-            
-            chooseOperation(operation) {
-                if (this.currentOperand === '') return;
-                if (this.previousOperand !== '') {
-                    this.compute();
-                }
-                this.operation = operation;
-                this.previousOperand = this.currentOperand;
-                this.currentOperand = '';
-            }
-            
-            compute() {
-                let computation;
-                const prev = parseFloat(this.previousOperand);
-                const current = parseFloat(this.currentOperand);
-                if (isNaN(prev) || isNaN(current)) return;
-                
-                switch (this.operation) {
-                    case '+':
-                        computation = prev + current;
-                        break;
-                    case '-':
-                        computation = prev - current;
-                        break;
-                    case '×':
-                        computation = prev * current;
-                        break;
-                    case '÷':
-                        if (current === 0) {
-                            alert("不能除以零");
-                            return;
-                        }
-                        computation = prev / current;
-                        break;
-                    default:
-                        return;
-                }
-                
-                this.currentOperand = computation;
-                this.operation = undefined;
-                this.previousOperand = '';
-            }
-            
-            getDisplayNumber(number) {
-                const stringNumber = number.toString();
-                const integerDigits = parseFloat(stringNumber.split('.')[0]);
-                const decimalDigits = stringNumber.split('.')[1];
-                let integerDisplay;
-                
-                if (isNaN(integerDigits)) {
-                    integerDisplay = '';
-                } else {
-                    integerDisplay = integerDigits.toLocaleString('en', {
-                        maximumFractionDigits: 0
-                    });
-                }
-                
-                if (decimalDigits != null) {
-                    return `${integerDisplay}.${decimalDigits}`;
-                } else {
-                    return integerDisplay;
-                }
-            }
-            
-            updateDisplay() {
-                this.currentOperandElement.innerText = this.getDisplayNumber(this.currentOperand);
-                if (this.operation != null) {
-                    this.previousOperandElement.innerText = 
-                        `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
-                } else {
-                    this.previousOperandElement.innerText = '';
-                }
-            }
-        }
-        
-        // 初始化计算器
-        const previousOperandElement = document.querySelector('.previous-operand');
-        const currentOperandElement = document.querySelector('.current-operand');
-        const calculator = new Calculator(previousOperandElement, currentOperandElement);
-        
-        // 按钮事件监听
-        document.querySelectorAll('button').forEach(button => {
-            button.addEventListener('click', () => {
-                if (button.classList.contains('span-two')) {
-                    if (button.innerText === 'AC') {
-                        calculator.clear();
-                    } else if (button.innerText === '0') {
-                        calculator.appendNumber(button.innerText);
-                    }
-                } else if (button.classList.contains('operator')) {
-                    calculator.chooseOperation(button.innerText);
-                } else if (button.classList.contains('equals')) {
-                    calculator.compute();
-                } else if (button.classList.contains('delete')) {
-                    calculator.delete();
-                } else {
-                    calculator.appendNumber(button.innerText);
-                }
-                
-                calculator.updateDisplay();
-            });
+        // 原始数据
+        const trainingData = [
+            {x: 0, y: 0},
+            {x: 1, y: 0},
+            {x: 4, y: 0.05},
+            {x: 6, y: 0},
+            {x: 8, y: 0.1},
+            {x: 10, y: 0.2},
+            {x: 12, y: 0.25},
+            {x: 14, y: 0.25},
+            {x: 16, y: 0.4},
+            {x: 18, y: 0.55},
+            {x: 20, y: 0.7},
+            {x: 22, y: 0.75},
+            {x: 24, y: 0.8},
+            {x: 26, y: 0.85},
+            {x: 28, y: 0.9},
+            {x: 33, y: 1},
+            {x: 35, y: 1},
+            {x: 37, y: 1},
+            {x: 39, y: 1},
+        ];
+
+        // 获取DOM元素
+        const degreeSlider = document.getElementById('degree');
+        const degreeValue = document.getElementById('degreeValue');
+        const calculateBtn = document.getElementById('calculateBtn');
+
+        // 更新多项式次数显示
+        degreeSlider.addEventListener('input', function() {
+            degreeValue.textContent = this.value;
         });
+
+        // 初始化图表
+        const ctx = document.getElementById('regressionChart').getContext('2d');
+        let regressionChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: '原始数据',
+                        data: trainingData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    },
+                    {
+                        label: '回归曲线',
+                        data: [],
+                        type: 'line',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '训练次数',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        min: 0,
+                        max: 37
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '优秀率',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        min: -0.2,
+                        max: 1.2
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += `(${context.parsed.x}, ${context.parsed.y.toFixed(2)})`;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 多项式回归计算函数
+        function polynomialRegression(data, degree) {
+            const n = data.length;
+            const X = [];
+            const y = [];
+            
+            // 构建X矩阵和y向量
+            for (let i = 0; i < n; i++) {
+                const row = [];
+                for (let j = 0; j <= degree; j++) {
+                    row.push(Math.pow(data[i].x, j));
+                }
+                X.push(row);
+                y.push(data[i].y);
+            }
+            
+            // 计算 X^T * X
+            const XT = math.transpose(X);
+            const XTX = math.multiply(XT, X);
+            
+            // 计算 X^T * y
+            const XTy = math.multiply(XT, y);
+            
+            // 求解线性方程组 (X^T * X) * coefficients = X^T * y
+            const coefficients = math.lusolve(XTX, XTy).map(arr => arr[0]);
+            
+            return coefficients;
+        }
+
+        // 生成回归曲线数据点
+        function generateRegressionPoints(coefficients, minX, maxX, step = 0.5) {
+            const points = [];
+            for (let x = minX; x <= maxX; x += step) {
+                let y = 0;
+                for (let i = 0; i < coefficients.length; i++) {
+                    y += coefficients[i] * Math.pow(x, i);
+                }
+                points.push({x: x, y: y});
+            }
+            return points;
+        }
+
+        // 计算按钮点击事件
+        calculateBtn.addEventListener('click', function() {
+            const degree = parseInt(degreeSlider.value);
+            
+            // 计算回归系数
+            const coefficients = polynomialRegression(trainingData, degree);
+            
+            // 生成回归曲线
+            const regressionPoints = generateRegressionPoints(coefficients, 0, 40, 0.5);
+            
+            // 更新图表
+            regressionChart.data.datasets[1].data = regressionPoints;
+            regressionChart.update();
+        });
+
+        // 初始计算
+        calculateBtn.click();
     </script>
 </body>
 </html>
