@@ -48,7 +48,7 @@
         }
         .chart-container {
             width: 100%;
-            height: 500px; /* 增加图表高度 */
+            height: 600px; /* 增加图表高度 */
             margin-bottom: 20px;
         }
         .controls {
@@ -160,7 +160,7 @@
         }
         @media (max-width: 768px) {
             .chart-container {
-                height: 500px; /* 在手机端进一步增加图表高度 */
+                height: 600px; /* 在手机端进一步增加图表高度 */
             }
             h1 {
                 font-size: 1.5rem;
@@ -184,7 +184,7 @@
                 <div class="control-group">
                     <h2>回归参数设置</h2>
                     <label for="degree">多项式次数: <span id="degreeValue" class="degree-value">4</span></label>
-                    <input type="range" id="degree" min="1" max="20" value="4">
+                    <input type="range" id="degree" min="0" max="16" value="4">
                     
                     <button id="calculateBtn">计算回归曲线</button>
                 </div>
@@ -252,18 +252,18 @@
                     {
                         label: '原始数据',
                         data: trainingData,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        pointRadius: 5,
-                        pointHoverRadius: 7
+                        backgroundColor: 'rgba(0, 0, 255, 1.0)', // 深蓝色
+                        borderColor: 'rgba(0, 0, 255, 1)', // 深蓝色边框
+                        pointRadius: 7, // 增大点尺寸
+                        pointHoverRadius: 9 // 增大悬停时点尺寸
                     },
                     {
                         label: '回归曲线',
                         data: [],
                         type: 'line',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        borderWidth: 2,
+                        borderColor: 'rgba(255, 0, 0, 1)', // 深红色
+                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                        borderWidth: 3, // 加粗线条
                         pointRadius: 0,
                         fill: false
                     }
@@ -283,7 +283,12 @@
                             }
                         },
                         min: 0,
-                        max: 39
+                        max: 39,
+                        ticks: {
+                            font: {
+                                size: 16 // 增大x轴数字大小
+                            }
+                        }
                     },
                     y: {
                         title: {
@@ -295,12 +300,22 @@
                             }
                         },
                         min: -0.2,
-                        max: 1.2
+                        max: 1.2,
+                        ticks: {
+                            font: {
+                                size: 16 // 增大y轴数字大小
+                            }
+                        }
                     }
                 },
                 plugins: {
                     legend: {
                         position: 'top',
+                        labels: {
+                            font: {
+                                size: 14 // 增大图例字体大小
+                            }
+                        }
                     },
                     tooltip: {
                         callbacks: {
@@ -320,6 +335,11 @@
 
         // 多项式回归计算函数
         function polynomialRegression(data, degree) {
+            // 当次数为0时，返回空数组，表示不计算回归曲线
+            if (degree === 0) {
+                return [];
+            }
+            
             const n = data.length;
             const X = [];
             const y = [];
@@ -349,6 +369,11 @@
 
         // 生成回归曲线数据点
         function generateRegressionPoints(coefficients, minX, maxX, step = 0.5) {
+            // 当系数为空数组时，返回空数组，表示不显示回归曲线
+            if (coefficients.length === 0) {
+                return [];
+            }
+            
             const points = [];
             for (let x = minX; x <= maxX; x += step) {
                 let y = 0;
@@ -372,6 +397,10 @@
             
             // 更新图表
             regressionChart.data.datasets[1].data = regressionPoints;
+            
+            // 当次数为0时，隐藏回归曲线图例
+            regressionChart.data.datasets[1].hidden = (degree === 0);
+            
             regressionChart.update();
         });
 
