@@ -1,411 +1,527 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单杠训练数据多项式回归分析</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        header {
-            background: linear-gradient(to right, #4b6cb7, #182848);
-            color: white;
-            padding: 25px 30px;
-            text-align: center;
-        }
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        .content {
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-        .chart-container {
-            width: 100%;
-            height: 600px; /* 增加图表高度 */
-            margin-bottom: 20px;
-        }
-        .controls {
-            width: 100%;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        .control-group {
-            margin-bottom: 20px;
-        }
-        h2 {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 2px solid #eaeaea;
-            padding-bottom: 8px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #34495e;
-        }
-        input[type="range"] {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .degree-value {
-            display: inline-block;
-            width: 30px;
-            text-align: center;
-            font-weight: bold;
-            color: #2980b9;
-        }
-        button {
-            background: linear-gradient(to right, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        button:hover {
-            background: linear-gradient(to right, #2980b9, #2471a3);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .results {
-            margin-top: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-            text-align: center;
-        }
-        .qrcode-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-        }
-        .qrcode {
-            width: 180px;
-            height: 180px;
-            margin: 15px auto;
-            background: #f8f9fa;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            color: #666;
-            border: 1px dashed #ccc;
-        }
-        .share-text {
-            margin-top: 15px;
-            font-size: 0.95rem;
-            color: #555;
-            line-height: 1.5;
-        }
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .data-table th, .data-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        .data-table th {
-            background-color: #f2f2f2;
-        }
-        .data-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            border-top: 1px solid #eee;
-        }
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 600px; /* 在手机端进一步增加图表高度 */
-            }
-            h1 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bo Wang · 3D Motion Perception &amp; Vision-Only UAV Navigation</title>
+<meta name="description" content="Bo Wang (王波), Ph.D. Research on multi-frame optical flow, scene flow estimation and vision-only UAV navigation.">
+<meta name="author" content="Bo Wang">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%231b1d24'/%3E%3Ctext x='50' y='68' font-family='Georgia,serif' font-size='46' fill='%23f4f2ec' text-anchor='middle'%3EBW%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbfaf7;
+    --paper-2:#ffffff;
+    --ink:#15171c;
+    --ink-soft:#3d4149;
+    --muted:#777d88;
+    --line:#e6e3db;
+    --line-soft:#efece5;
+    --accent:#243f9c;
+    --accent-soft:#eef1fb;
+    --serif:"Newsreader",Georgia,"Songti SC",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:15.5px;
+    line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  ::selection{background:#dfe4f7;color:#111}
+  a{color:inherit;text-decoration:none}
+  .wrap{
+    display:grid;
+    grid-template-columns:264px minmax(0,1fr);
+    gap:76px;
+    max-width:1120px;
+    margin:0 auto;
+    padding:76px 34px 110px;
+  }
+
+  /* ---------- sidebar ---------- */
+  aside{position:sticky;top:76px;align-self:start}
+  .avatar{
+    width:92px;height:92px;border-radius:50%;
+    background:radial-gradient(120% 120% at 30% 20%,#3b4a72 0%,#191b22 62%);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:30px;letter-spacing:.5px;
+    color:#f6f4ee;
+    box-shadow:0 10px 26px -14px rgba(20,25,45,.85),inset 0 1px 0 rgba(255,255,255,.16);
+    margin-bottom:26px;
+  }
+  .name{
+    font-family:var(--serif);
+    font-size:31px;
+    font-weight:500;
+    letter-spacing:-.4px;
+    line-height:1.15;
+  }
+  .name-cn{
+    display:inline-block;
+    font-family:var(--sans);
+    font-size:13px;
+    font-weight:400;
+    letter-spacing:2px;
+    color:var(--muted);
+    margin-left:9px;
+    vertical-align:2px;
+  }
+  .role{
+    margin-top:10px;
+    font-size:13.5px;
+    line-height:1.65;
+    color:var(--ink-soft);
+  }
+  .role b{font-weight:500;color:var(--ink)}
+  .side-bio{
+    margin-top:16px;
+    font-size:13px;
+    line-height:1.75;
+    color:var(--muted);
+  }
+  .side-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .side-links a{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:500;letter-spacing:.2px;
+    padding:6px 12px;border:1px solid var(--line);border-radius:999px;
+    color:var(--ink-soft);background:var(--paper-2);
+    transition:.18s ease;
+  }
+  .side-links a:hover{border-color:#c9c5ba;color:var(--ink);transform:translateY(-1px)}
+  .side-links svg{width:13px;height:13px;fill:currentColor;opacity:.85}
+
+  nav{margin-top:34px;border-top:1px solid var(--line-soft);padding-top:20px}
+  nav a{
+    display:flex;align-items:baseline;gap:12px;
+    padding:6px 0;
+    font-size:13px;
+    color:var(--muted);
+    transition:.18s ease;
+  }
+  nav a i{
+    font-family:var(--mono);font-style:normal;
+    font-size:10px;letter-spacing:.5px;color:#b6b1a4;
+    transition:.18s ease;
+  }
+  nav a:hover{color:var(--ink)}
+  nav a:hover i{color:var(--accent)}
+  nav a.on{color:var(--ink)}
+  nav a.on i{color:var(--accent)}
+
+  /* ---------- main ---------- */
+  main{min-width:0}
+  section{margin-bottom:74px;scroll-margin-top:56px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+  .sec-head h2{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:22px;
+    letter-spacing:-.2px;
+    white-space:nowrap;
+  }
+  .sec-head .rule{flex:1;height:1px;background:var(--line)}
+
+  .lede{
+    font-size:16.5px;
+    line-height:1.85;
+    color:var(--ink-soft);
+    max-width:64ch;
+  }
+  .lede strong{font-weight:500;color:var(--ink)}
+  .lede + .lede{margin-top:14px}
+
+  /* research rows */
+  .focus{list-style:none;border-top:1px solid var(--line-soft)}
+  .focus li{
+    display:grid;grid-template-columns:236px minmax(0,1fr);gap:34px;
+    padding:20px 0 19px;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .focus .idx{
+    font-family:var(--mono);font-size:10px;letter-spacing:1px;
+    color:#bcb7aa;display:block;margin-bottom:7px;
+  }
+  .focus h3{
+    font-family:var(--serif);font-weight:500;font-size:17px;
+    line-height:1.35;letter-spacing:-.1px;color:var(--ink);
+  }
+  .focus p{font-size:13.6px;line-height:1.78;color:var(--muted);max-width:62ch}
+
+  /* news */
+  .news{list-style:none}
+  .news li{
+    display:grid;grid-template-columns:96px 1fr;gap:20px;
+    padding:11px 0;
+    border-bottom:1px solid var(--line-soft);
+    font-size:14px;line-height:1.65;
+  }
+  .news li:first-child{border-top:1px solid var(--line-soft)}
+  .news time{
+    font-family:var(--mono);font-size:11px;letter-spacing:.3px;
+    color:#9a958a;padding-top:3px;
+  }
+  .news li span{color:var(--ink-soft)}
+  .news li em{font-style:normal;font-weight:500;color:var(--ink)}
+
+  /* publications */
+  .pub{
+    position:relative;
+    padding:26px 26px 22px 28px;
+    border:1px solid var(--line-soft);
+    border-radius:12px;
+    background:var(--paper-2);
+    margin-bottom:16px;
+    transition:.2s ease;
+  }
+  .pub::before{
+    content:"";position:absolute;left:0;top:22px;bottom:22px;width:2px;
+    background:var(--line);border-radius:2px;transition:.2s ease;
+  }
+  .pub:hover{border-color:#dcd8cc;box-shadow:0 16px 34px -28px rgba(20,25,45,.7)}
+  .pub:hover::before{background:var(--accent);top:14px;bottom:14px}
+  .pub-top{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+  .venue{
+    font-family:var(--mono);
+    font-size:10.5px;
+    font-weight:500;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:5px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    white-space:nowrap;
+  }
+  .venue.review{background:#fdf3e6;color:#9a6412}
+  .venue.pre{background:#f1f0ec;color:#6d6a60}
+  .pub-top .yr{font-family:var(--mono);font-size:11px;color:#a9a49a}
+  .pub h3{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:19px;
+    line-height:1.4;
+    letter-spacing:-.15px;
+    margin-bottom:8px;
+  }
+  .pub h3 a{background-image:linear-gradient(currentColor,currentColor);background-size:0 1px;background-repeat:no-repeat;background-position:0 100%;transition:.25s}
+  .pub h3 a:hover{background-size:100% 1px}
+  .authors{font-size:13px;color:var(--ink-soft);line-height:1.65}
+  .authors b{font-weight:600;color:var(--ink)}
+  .pub-venue{font-size:12.5px;font-style:italic;color:var(--muted);margin-top:3px;font-family:var(--serif)}
+  .pub-abs{font-size:13.3px;line-height:1.75;color:var(--ink-soft);margin-top:12px;max-width:70ch}
+  .pub-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .pub-links a{
+    font-size:11.5px;font-weight:500;letter-spacing:.2px;
+    padding:4px 10px;border-radius:6px;
+    background:#f6f4ee;color:var(--ink-soft);
+    border:1px solid transparent;
+    transition:.16s ease;
+  }
+  .pub-links a:hover{background:var(--ink);color:#fbfaf7}
+  .pub-links a.ghost{background:transparent;border-color:var(--line);color:var(--muted)}
+  .pub-links a.ghost:hover{background:var(--accent-soft);border-color:#d3d9f0;color:var(--accent)}
+
+  /* code grid */
+  .repo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .repo{
+    display:flex;flex-direction:column;gap:6px;
+    padding:16px 16px 14px;
+    border:1px solid var(--line-soft);
+    border-radius:10px;
+    background:var(--paper-2);
+    transition:.18s ease;
+  }
+  .repo:hover{border-color:#d9d5c8;transform:translateY(-2px);box-shadow:0 12px 26px -24px rgba(20,25,45,.8)}
+  .repo-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .repo-top b{font-family:var(--mono);font-size:12.5px;font-weight:500;letter-spacing:-.1px}
+  .repo-top span{font-family:var(--mono);font-size:10.5px;color:#a9a49a;white-space:nowrap}
+  .repo p{font-size:12.2px;line-height:1.6;color:var(--muted)}
+
+  footer{
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    font-size:12px;color:var(--muted);
+    font-family:var(--mono);
+  }
+  footer a:hover{color:var(--ink)}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(12px);transition:opacity .6s cubic-bezier(.22,.61,.36,1),transform .6s cubic-bezier(.22,.61,.36,1)}
+  .rv.in{opacity:1;transform:none}
+
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;gap:44px;padding:40px 22px 72px}
+    aside{position:static;border-bottom:1px solid var(--line);padding-bottom:26px}
+    .avatar{width:72px;height:72px;font-size:24px;margin-bottom:18px}
+    .name{font-size:27px}
+    nav{margin-top:24px;border-top:none;padding-top:0;display:flex;flex-wrap:wrap;gap:8px}
+    nav a{padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:var(--paper-2)}
+    nav a i{display:none}
+    .focus li{grid-template-columns:1fr;gap:6px;padding:16px 0}
+    .repo-grid{grid-template-columns:1fr}
+    section{margin-bottom:56px}
+    .pub{padding:22px 18px 18px 20px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .rv{opacity:1;transform:none;transition:none}
+    *{transition:none!important}
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>单杠训练数据多项式回归分析</h1>
-            <p class="subtitle">基于最小二乘法的多项式回归模型拟合</p>
-        </header>
-        
-        <div class="content">
-            <div class="chart-container">
-                <canvas id="regressionChart"></canvas>
-            </div>
-            
-            <div class="controls">
-                <div class="control-group">
-                    <h2>回归参数设置</h2>
-                    <label for="degree">多项式次数: <span id="degreeValue" class="degree-value">4</span></label>
-                    <input type="range" id="degree" min="0" max="16" value="4">
-                    
-                    <button id="calculateBtn">计算回归曲线</button>
-                </div>
-                
-                <div class="results">
-                    <h2>手机扫码使用</h2>
-                    <div class="qrcode-section">
-                        <div class="qrcode-container">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wwsource.github.io" alt="QR Code">
-                        </div>
-                        <p class="share-text">
-                            使用手机扫描二维码<br>
-                            查看非线性回归效果
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <footer>
-            <p>数据来源：单杠数据.xlsx | 代码来源：国防科大AI伴学助手 | 代码审核：王波</p>
-        </footer>
+<div class="wrap">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside>
+    <!-- 想换成真人照片：把 .avatar 整块替换为 <img class="avatar" src="avatar.jpg" alt="Bo Wang"> -->
+<!--    <div class="avatar">BW</div>-->
+    <img class="avatar" src="./asset/avatar.jpg" alt="Bo Wang">
+
+    <div class="name">Bo Wang<span class="name-cn">王波</span></div>
+    <div class="role">
+      Ph.D., <b>National University of Defense Technology</b><br>
+      Computer Vision · 3D Motion Perception
+    </div>
+    <p class="side-bio">
+      I work on how machines recover 3D motion from video — multi-frame optical flow,
+      scene flow, and the geometry that ties UAV imagery to satellite maps.
+    </p>
+
+    <div class="side-links">
+      <a href="https://github.com/wwsource" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
+      </a>
+      <!-- 需要的话在这里补 Google Scholar / 邮箱 / CV，例如：
+      <a href="mailto:you@example.com">Email</a> -->
     </div>
 
-    <script>
-        // 原始数据
-        const trainingData = [
-            {x: 0, y: 0},
-            {x: 1, y: 0},
-            {x: 4, y: 0.05},
-            {x: 6, y: 0},
-            {x: 8, y: 0.1},
-            {x: 10, y: 0.2},
-            {x: 12, y: 0.25},
-            {x: 14, y: 0.25},
-            {x: 16, y: 0.4},
-            {x: 18, y: 0.55},
-            {x: 20, y: 0.7},
-            {x: 22, y: 0.75},
-            {x: 24, y: 0.8},
-            {x: 26, y: 0.85},
-            {x: 28, y: 0.9},
-            {x: 33, y: 1},
-            {x: 35, y: 1},
-            {x: 37, y: 1},
-            {x: 39, y: 1},
-        ];
+    <nav id="nav">
+      <a href="#about"><i>01</i>About</a>
+      <a href="#research"><i>02</i>Research</a>
+      <a href="#news"><i>03</i>News</a>
+      <a href="#publications"><i>04</i>Publications</a>
+      <a href="#code"><i>05</i>Open&nbsp;Source</a>
+    </nav>
+  </aside>
 
-        // 获取DOM元素
-        const degreeSlider = document.getElementById('degree');
-        const degreeValue = document.getElementById('degreeValue');
-        const calculateBtn = document.getElementById('calculateBtn');
+  <!-- ============ MAIN ============ -->
+  <main>
 
-        // 更新多项式次数显示
-        degreeSlider.addEventListener('input', function() {
-            degreeValue.textContent = this.value;
-        });
+    <!-- About -->
+    <section id="about" class="rv">
+      <div class="sec-head"><h2>About</h2><div class="rule"></div></div>
+      <p class="lede">
+        I am <strong>Bo Wang</strong>, holding a Ph.D. from the National University of Defense Technology.
+        My research sits at the intersection of <strong>multi-frame geometry</strong> and
+        <strong>3D motion estimation</strong>: given a short video, how much of the scene's motion —
+        dense, long-range, and robust to occlusion — can be recovered, and how far can that carry a
+        machine that has to navigate without GPS?
+      </p>
+      <p class="lede">
+        Along this line I have worked on multi-frame optical flow via feature splatting (IJCV 2024),
+        long-term scene flow estimation for dynamic real-world scenes (T-PAMI 2025), efficient temporal
+        attention for multi-frame flow (IROS 2025), and 3D motion feature splatting for scene flow
+        (T-CSVT 2026). More recently I have been extending the same geometric view to
+        <strong>cross-view geo-localization</strong>, aligning what a UAV sees with satellite imagery
+        as a substitute for satellite navigation.
+      </p>
+    </section>
 
-        // 初始化图表
-        const ctx = document.getElementById('regressionChart').getContext('2d');
-        let regressionChart = new Chart(ctx, {
-            type: 'scatter',
-            data: {
-                datasets: [
-                    {
-                        label: '原始数据',
-                        data: trainingData,
-                        backgroundColor: 'rgba(0, 0, 255, 1.0)', // 深蓝色
-                        borderColor: 'rgba(0, 0, 255, 1)', // 深蓝色边框
-                        pointRadius: 7, // 增大点尺寸
-                        pointHoverRadius: 9 // 增大悬停时点尺寸
-                    },
-                    {
-                        label: '回归曲线',
-                        data: [],
-                        type: 'line',
-                        borderColor: 'rgba(255, 0, 0, 1)', // 深红色
-                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                        borderWidth: 3, // 加粗线条
-                        pointRadius: 0,
-                        fill: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: '训练次数',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        min: 0,
-                        max: 39,
-                        ticks: {
-                            font: {
-                                size: 16 // 增大x轴数字大小
-                            }
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: '优秀率',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        min: -0.2,
-                        max: 1.2,
-                        ticks: {
-                            font: {
-                                size: 16 // 增大y轴数字大小
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            font: {
-                                size: 14 // 增大图例字体大小
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += `(${context.parsed.x}, ${context.parsed.y.toFixed(2)})`;
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+    <!-- Research -->
+    <section id="research" class="rv">
+      <div class="sec-head"><h2>Research</h2><div class="rule"></div></div>
+      <ul class="focus">
+        <li>
+          <div><span class="idx">01</span><h3>Multi-frame Optical Flow</h3></div>
+          <p>Fusing several neighbouring frames into a single-resolution, two-frame backbone — through splatting and
+             temporal attention — to handle occlusion without giving up inference speed.</p>
+        </li>
+        <li>
+          <div><span class="idx">02</span><h3>Scene Flow &amp; Long-term 3D Motion</h3></div>
+          <p>Recovering dense 3D motion over long sequences of dynamic, non-rigid scenes, with explicit handling of
+             depth noise, spatial occlusion and temporal drift.</p>
+        </li>
+        <li>
+          <div><span class="idx">03</span><h3>Vision-Only UAV Navigation</h3></div>
+          <p>Cross-view geo-localization between oblique UAV imagery and satellite tiles, cast as an iterative planar
+             rigid alignment rather than a pure appearance match.</p>
+        </li>
+      </ul>
+    </section>
 
-        // 多项式回归计算函数
-        function polynomialRegression(data, degree) {
-            // 当次数为0时，返回空数组，表示不计算回归曲线
-            if (degree === 0) {
-                return [];
-            }
-            
-            const n = data.length;
-            const X = [];
-            const y = [];
-            
-            // 构建X矩阵和y向量
-            for (let i = 0; i < n; i++) {
-                const row = [];
-                for (let j = 0; j <= degree; j++) {
-                    row.push(Math.pow(data[i].x, j));
-                }
-                X.push(row);
-                y.push(data[i].y);
-            }
-            
-            // 计算 X^T * X
-            const XT = math.transpose(X);
-            const XTX = math.multiply(XT, X);
-            
-            // 计算 X^T * y
-            const XTy = math.multiply(XT, y);
-            
-            // 求解线性方程组 (X^T * X) * coefficients = X^T * y
-            const coefficients = math.lusolve(XTX, XTy).map(arr => arr[0]);
-            
-            return coefficients;
-        }
+    <!-- News -->
+    <section id="news" class="rv">
+      <div class="sec-head"><h2>News</h2><div class="rule"></div></div>
+      <ul class="news">
+        <li><time>Nov 2026</time><span><em>RigidAnchor</em> — cross-view geo-localization for UAVs via iterative planar rigid alignment — is released on arXiv.</span></li>
+        <li><time>Nov 2026</time><span><em>SplatFlow3D</em> is accepted to <em>IEEE T-CSVT</em>; code release in progress.</span></li>
+        <li><time>Jun 2025</time><span><em>ETA</em> is accepted to <em>IROS 2025</em>.</span></li>
+        <li><time>May 2025</time><span><em>SceneTracker</em> is accepted to <em>IEEE T-PAMI</em> (Vol. 47, No. 9).</span></li>
+        <li><time>Jan 2024</time><span><em>SplatFlow</em> is accepted to <em>IJCV</em>.</span></li>
+        <li><time>2023</time><span>Ranked <em>1st</em> on the KITTI and Spring scene flow leaderboards.</span></li>
+      </ul>
+    </section>
 
-        // 生成回归曲线数据点
-        function generateRegressionPoints(coefficients, minX, maxX, step = 0.5) {
-            // 当系数为空数组时，返回空数组，表示不显示回归曲线
-            if (coefficients.length === 0) {
-                return [];
-            }
-            
-            const points = [];
-            for (let x = minX; x <= maxX; x += step) {
-                let y = 0;
-                for (let i = 0; i < coefficients.length; i++) {
-                    y += coefficients[i] * Math.pow(x, i);
-                }
-                points.push({x: x, y: y});
-            }
-            return points;
-        }
+    <!-- Publications -->
+    <section id="publications" class="rv">
+      <div class="sec-head"><h2>Selected Publications</h2><div class="rule"></div></div>
 
-        // 计算按钮点击事件
-        calculateBtn.addEventListener('click', function() {
-            const degree = parseInt(degreeSlider.value);
-            
-            // 计算回归系数
-            const coefficients = polynomialRegression(trainingData, degree);
-            
-            // 生成回归曲线
-            const regressionPoints = generateRegressionPoints(coefficients, 0, 40, 0.5);
-            
-            // 更新图表
-            regressionChart.data.datasets[1].data = regressionPoints;
-            
-            // 当次数为0时，隐藏回归曲线图例
-            regressionChart.data.datasets[1].hidden = (degree === 0);
-            
-            regressionChart.update();
-        });
+      <article class="pub">
+        <div class="pub-top"><span class="venue">TPAMI</span><span class="yr">2025</span></div>
+        <h3><a href="https://arxiv.org/abs/2403.19924" target="_blank" rel="noopener">SceneTracker: Long-term Scene Flow Estimation Network</a></h3>
+        <p class="authors"><b>Bo Wang</b>, Jian Li, Yang Yu, Li Liu, Zhenping Sun, Dewen Hu</p>
+        <p class="pub-venue">IEEE Transactions on Pattern Analysis and Machine Intelligence, 47(9): 8305–8312</p>
+        <p class="pub-abs">Defines long-term scene flow estimation (LSFE) as a task and proposes SceneTracker, a network that
+          tracks 3D motion of a query point across a long frame sequence while resisting 3D spatial occlusion and depth
+          noise. We also build LSFDriving, the first real-world evaluation set for LSFE, covering static backgrounds,
+          moving vehicles, and the joints and garments of moving pedestrians.</p>
+        <div class="pub-links">
+          <a href="https://arxiv.org/abs/2403.19924" target="_blank" rel="noopener">Paper</a>
+          <a href="https://github.com/wwsource/SceneTracker" target="_blank" rel="noopener">Code</a>
+          <a href="https://huggingface.co/wwcreator/SceneTracker" target="_blank" rel="noopener">Weights</a>
+          <a class="ghost" href="https://mp.weixin.qq.com/s/XRo605YrAKbQPlQP2dELsg" target="_blank" rel="noopener">中文介绍</a>
+        </div>
+      </article>
 
-        // 初始计算
-        calculateBtn.click();
-    </script>
+      <article class="pub">
+        <div class="pub-top"><span class="venue">IJCV</span><span class="yr">2024</span></div>
+        <h3><a href="https://arxiv.org/abs/2306.08887" target="_blank" rel="noopener">SplatFlow: Learning Multi-frame Optical Flow via Splatting</a></h3>
+        <p class="authors"><b>Bo Wang</b>, Yifan Zhang, Jian Li, Yang Yu, Zhenping Sun, Li Liu, Dewen Hu</p>
+        <p class="pub-venue">International Journal of Computer Vision, 132(8): 3023–3045</p>
+        <p class="pub-abs">A multi-frame optical flow framework built explicitly for single-resolution, iterative two-frame
+          backbones: neighbouring frames are splatted into the reference view so that an off-the-shelf backbone gains
+          multi-frame context at almost no extra cost. Accuracy improves markedly in occluded regions while inference
+          speed stays high, with a 19.4% error reduction over the previous best on Sintel at the time of submission.</p>
+        <div class="pub-links">
+          <a href="https://arxiv.org/abs/2306.08887" target="_blank" rel="noopener">Paper</a>
+          <a href="https://github.com/wwsource/SplatFlow" target="_blank" rel="noopener">Code</a>
+          <a href="https://huggingface.co/wwcreator/SplatFlow" target="_blank" rel="noopener">Weights</a>
+        </div>
+      </article>
+
+      <article class="pub">
+        <div class="pub-top"><span class="venue">T-CSVT</span><span class="yr">2026</span></div>
+        <h3><a href="https://arxiv.org/abs/2611.19409" target="_blank" rel="noopener">SplatFlow3D: Learning Scene Flow via 3D Motion Feature Splatting</a></h3>
+        <p class="authors"><b>Bo Wang</b>, Zhenping Sun, Yang Yu, Jian Li, Li Liu, Dewen Hu</p>
+        <p class="pub-venue">IEEE Transactions on Circuits and Systems for Video Technology</p>
+        <p class="pub-abs">Couples dense image-plane evidence with sparse depth evidence by hierarchically constructing a 3D
+          motion feature — decoupling first, then re-coupling. The resulting backbone (SimpleFlow3D) is lifted to a
+          weight-sharing multi-frame network, SplatFlow3D, which unifies first-frame and later-frame inference through
+          pseudo inputs and reaches state-of-the-art scene flow accuracy with a minimal parameter budget.</p>
+        <div class="pub-links">
+          <a href="https://arxiv.org/abs/2611.19409" target="_blank" rel="noopener">Paper</a>
+          <a href="https://github.com/wwsource/SplatFlow3D" target="_blank" rel="noopener">Code (coming soon)</a>
+        </div>
+      </article>
+
+      <article class="pub">
+        <div class="pub-top"><span class="venue">IROS</span><span class="yr">2025</span></div>
+        <h3><a href="https://github.com/wwsource/ETA" target="_blank" rel="noopener">ETA: Learning Optical Flow with Efficient Temporal Attention</a></h3>
+        <p class="authors"><b>Bo Wang</b> et al.</p>
+        <p class="pub-venue">IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</p>
+        <p class="pub-abs">A pioneering combination of multi-frame input and attention for optical flow. The paper introduces
+          attention confidence, a plug-and-play signal that lets the network consume temporal attention more efficiently —
+          improving accuracy on occlusions while reducing the cost that usually comes with multi-frame settings.</p>
+        <div class="pub-links">
+          <a href="https://github.com/wwsource/ETA" target="_blank" rel="noopener">Code</a>
+        </div>
+      </article>
+
+      <article class="pub">
+        <div class="pub-top"><span class="venue pre">arXiv</span><span class="yr">2026</span></div>
+        <h3><a href="https://github.com/wwsource/RigidAnchor" target="_blank" rel="noopener">RigidAnchor: Cross-View Geo-Localization for UAV via Iterative Planar Rigid Alignment</a></h3>
+        <p class="authors"><b>Bo Wang</b>, Dekang Zhu, Jian Li, Zhipeng Meng, Bo Wang, Dewen Hu</p>
+        <p class="pub-abs">Localizes a UAV against satellite imagery without GPS by treating the oblique-to-overhead relation as
+          an iterative planar rigid alignment, rather than a direct appearance matching problem. Paper and code are being
+          prepared for release.</p>
+        <div class="pub-links">
+          <a href="https://github.com/wwsource/RigidAnchor" target="_blank" rel="noopener">Code (coming soon)</a>
+        </div>
+      </article>
+
+      <article class="pub">
+        <div class="pub-top"><span class="venue review">Under Review</span><span class="yr">2026</span></div>
+        <h3>CamLiRoute: Camera–LiDAR–Route Fusion Network for Off-road Local Route Detection</h3>
+        <p class="authors"><b>Bo Wang</b>, Yushi Quan, Dekang Zhu, et al.</p>
+        <p class="pub-abs">Fuses camera, LiDAR and route priors to detect local traversable routes in off-road scenes, where
+          neither a lane model nor a road map is available. Code will be released upon acceptance.</p>
+        <div class="pub-links">
+          <a class="ghost" href="https://github.com/wwsource/CamLiRoute" target="_blank" rel="noopener">Repository</a>
+        </div>
+      </article>
+    </section>
+
+    <!-- Code -->
+    <section id="code" class="rv">
+      <div class="sec-head"><h2>Open Source</h2><div class="rule"></div></div>
+      <div class="repo-grid">
+        <a class="repo" href="https://github.com/wwsource/SceneTracker" target="_blank" rel="noopener">
+          <div class="repo-top"><b>SceneTracker</b><span>133 ★</span></div>
+          <p>Long-term scene flow estimation · T-PAMI 2025</p>
+        </a>
+        <a class="repo" href="https://github.com/wwsource/SplatFlow" target="_blank" rel="noopener">
+          <div class="repo-top"><b>SplatFlow</b><span>65 ★</span></div>
+          <p>Multi-frame optical flow via splatting · IJCV 2024</p>
+        </a>
+        <a class="repo" href="https://github.com/wwsource/SplatFlow3D" target="_blank" rel="noopener">
+          <div class="repo-top"><b>SplatFlow3D</b><span>1 ★</span></div>
+          <p>Scene flow via 3D motion feature splatting · T-CSVT 2026</p>
+        </a>
+        <a class="repo" href="https://github.com/wwsource/ETA" target="_blank" rel="noopener">
+          <div class="repo-top"><b>ETA</b><span>3 ★</span></div>
+          <p>Optical flow with efficient temporal attention · IROS 2025</p>
+        </a>
+        <a class="repo" href="https://github.com/wwsource/RigidAnchor" target="_blank" rel="noopener">
+          <div class="repo-top"><b>RigidAnchor</b><span>arXiv 2026</span></div>
+          <p>Cross-view geo-localization for UAV navigation</p>
+        </a>
+        <a class="repo" href="https://github.com/wwsource/CamLiRoute" target="_blank" rel="noopener">
+          <div class="repo-top"><b>CamLiRoute</b><span>Under review</span></div>
+          <p>Camera–LiDAR–route fusion for off-road route detection</p>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <span>© <span id="yr">2026</span> Bo Wang</span>
+      <span>Built as a single static page · hosted on GitHub Pages</span>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+  // scrollspy
+  const links = [...document.querySelectorAll('#nav a')];
+  const secs = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  secs.forEach(s => spy.observe(s));
+</script>
 </body>
 </html>
